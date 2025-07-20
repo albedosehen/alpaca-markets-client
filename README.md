@@ -13,18 +13,12 @@
 - **High-Frequency Trading Support** - Specialized client for high-frequency trading applications.
 - **Reliable & Performant** - Request deduplication, caching, rate-limiting, circuit breaker configuration, and connection pooling for high reliability.
 
-## Installation
-
-```typescript
-import { AlpacaClient, createDefaultAlpacaConfig } from "jsr:@albedosehen/alpaca-markets-client"
-```
-
-## Quick Start
+## Get Started
 
 ### Basic Setup
 
 ```typescript
-import { AlpacaClient, createDefaultAlpacaConfig } from "jsr:@albedosehen/alpaca-markets-client"
+import { AlpacaMarketClient, createDefaultAlpacaConfig } from "jsr:@albedosehen/alpaca-markets-client"
 
 // Create configuration for paper trading
 const config = createDefaultAlpacaConfig({
@@ -32,8 +26,11 @@ const config = createDefaultAlpacaConfig({
   secretKey: 'your-secret-key'
 }, 'paper')
 
-// Initialize client
-const client = new AlpacaClient(config)
+// Create the client
+const client = new AlpacaMarketClient(config)
+
+// Test the connections
+await client.testClientConnections()
 ```
 
 ### Trading Operations
@@ -180,7 +177,7 @@ const advancedConfig = createDefaultAlpacaConfig({
   }
 })
 
-const client = new AlpacaClient(advancedConfig)
+const client = new AlpacaMarketClient(advancedConfig)
 ```
 
 ## Error Handling
@@ -263,7 +260,7 @@ try {
   console.log(`Using ${detectedEnvironment} credentials`)
 
   const config = createDefaultAlpacaConfig(credentials, detectedEnvironment)
-  const client = new AlpacaClient(config)
+  const client = new AlpacaMarketClient(config)
 } catch (error) {
   console.error('Failed to load credentials:', error.message)
 }
@@ -343,7 +340,7 @@ import type {
   Bar,
   Trade,
   Quote,
-  AlpacaClientConfig,
+  AlpacaMarketClientConfig,
   CreateOrderRequest
 } from "jsr:@albedosehen/alpaca-markets-client"
 

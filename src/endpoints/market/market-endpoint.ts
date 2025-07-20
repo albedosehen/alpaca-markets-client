@@ -109,7 +109,7 @@ export class MarketDataEndpoint {
     logger.debug('Getting latest bars', { params })
 
     try {
-      const response = await this.client.request<{ value: { bars: Record<string, BarRaw> } }>(
+      const response = await this.client.request<{ bars: Record<string, BarRaw> }>(
         '/v2/stocks/bars/latest',
         {
           method: 'GET',
@@ -553,7 +553,7 @@ export class MarketDataEndpoint {
     if (!response?.value?.bars) {
       logger.warn('Response bars field is null, undefined, or missing', {
         response,
-        barsField: response?.value?.bars,
+        barsField: response?.value,
       })
       return {
         data: {},
@@ -586,21 +586,21 @@ export class MarketDataEndpoint {
    * @private
    */
   private transformLatestBarsResponse(
-    response: { value: { bars: Record<string, BarRaw> } },
+    response: { bars: Record<string, BarRaw> },
     logger: ReturnType<AlpacaMarketClient['getLogger']>,
   ): Record<string, Bar> {
-    // Check if response.value.bars exists and is not null/undefined
-    if (!response?.value?.bars) {
+    // Check if response.bars exists and is not null/undefined
+    if (!response?.bars) {
       logger.warn('Response bars field is null, undefined, or missing', {
         response,
-        barsField: response?.value?.bars,
+        barsField: response?.bars,
       })
       return {}
     }
 
     const transformedBars: Record<string, Bar> = {}
 
-    for (const [symbol, rawBar] of Object.entries(response.value.bars)) {
+    for (const [symbol, rawBar] of Object.entries(response.bars)) {
       transformedBars[symbol] = mapBarRawToBar(rawBar, symbol)
     }
 
