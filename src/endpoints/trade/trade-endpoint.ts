@@ -43,11 +43,13 @@ export class AlpacaTradeEndpoint {
   private circuitBreaker?: CircuitBreaker
   private requestDeduplicator?: RequestDeduplicator
   private connectionPool?: ConnectionPool
+  private readonly debug: boolean
 
   constructor(
     private readonly apiClient: AlpacaMarketClient,
     config?: TradingClientConfig,
   ) {
+    this.debug = config?.debug ?? false
     if (config?.cacheConfig?.enabled) {
       this.cache = new Cache(
         {
@@ -101,7 +103,9 @@ export class AlpacaTradeEndpoint {
    * @throws {ValidationError} If the order data is invalid
    */
   async createOrder(orderRequest: CreateOrderRequest): Promise<Order> {
-    console.info('Creating order', { symbol: orderRequest.symbol, side: orderRequest.side })
+    if (this.debug) {
+      console.info('Creating order', { symbol: orderRequest.symbol, side: orderRequest.side })
+    }
 
     return this.executeWithCircuitBreaker(async () => {
       try {
@@ -151,7 +155,9 @@ export class AlpacaTradeEndpoint {
    * @throws {ValidationError} If the update data is invalid
    */
   async updateOrder(orderId: string, updateRequest: UpdateOrderRequest): Promise<Order> {
-    console.info('Updating order', { orderId })
+    if (this.debug) {
+      console.info('Updating order', { orderId })
+    }
     assertString(orderId, 'orderId')
 
     return this.executeWithCircuitBreaker(async () => {
@@ -201,8 +207,6 @@ export class AlpacaTradeEndpoint {
    * @throws {ValidationError} If the parameters are invalid
    */
   async getOrders(params?: GetOrdersParams): Promise<Order[]> {
-    console.info('Getting orders', { params })
-
     return this.executeWithCircuitBreaker(async () => {
       try {
         const response = await this.apiClient.request<Order[]>('/v2/orders', {
@@ -268,7 +272,9 @@ export class AlpacaTradeEndpoint {
    * @throws {ValidationError} If the order ID is invalid
    */
   async cancelOrder(orderId: string): Promise<Order> {
-    console.info('Cancelling order', { orderId })
+    if (this.debug) {
+      console.info('Cancelling order', { orderId })
+    }
     assertString(orderId, 'orderId')
 
     return this.executeWithCircuitBreaker(async () => {
@@ -379,7 +385,6 @@ export class AlpacaTradeEndpoint {
    * @throws {ValidationError} If the symbol is invalid
    */
   async getPosition(symbol: string): Promise<Position> {
-    console.info('Getting position', { symbol })
     assertString(symbol, 'symbol')
 
     return this.executeWithCircuitBreaker(async () => {
@@ -429,7 +434,9 @@ export class AlpacaTradeEndpoint {
    * @throws {ValidationError} If the symbol is invalid or close request data is invalid
    */
   async closePosition(symbol: string, closeRequest?: ClosePositionRequest): Promise<Order> {
-    console.info('Closing position', { symbol, closeRequest })
+    if (this.debug) {
+      console.info('Closing position', { symbol, closeRequest })
+    }
     assertString(symbol, 'symbol')
 
     return this.executeWithCircuitBreaker(async () => {
@@ -479,8 +486,6 @@ export class AlpacaTradeEndpoint {
    * @throws {ValidationError} If the account data is invalid
    */
   async getAccount(): Promise<Account> {
-    console.info('Getting account information')
-
     return this.executeWithCircuitBreaker(async () => {
       try {
         const response = await this.apiClient.request<Account>('/v2/account', {
@@ -526,8 +531,6 @@ export class AlpacaTradeEndpoint {
    * @throws {ValidationError} If the parameters are invalid
    */
   async getAccountActivities(params?: GetAccountActivitiesParams): Promise<AccountActivity[]> {
-    console.info('Getting account activities', { params })
-
     return this.executeWithCircuitBreaker(async () => {
       try {
         const response = await this.apiClient.request<AccountActivity[]>('/v2/account/activities', {
@@ -584,7 +587,9 @@ export class AlpacaTradeEndpoint {
    * Clean up resources and close all connections.
    */
   destroy(): void {
-    console.info('Destroying trading client')
+    if (this.debug) {
+      console.info('Destroying trading client')
+    }
     this.cache?.dispose()
     this.circuitBreaker?.reset()
     this.requestDeduplicator?.clear()

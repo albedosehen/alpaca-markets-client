@@ -1,4 +1,4 @@
-import type { AlpacaClientConfig as AlpacaMarketClientConfig, AlpacaEnvironment } from './alpaca.types.ts'
+import type { AlpacaClientConfig, AlpacaEnvironment } from './alpaca.types.ts'
 import { createTradingClient } from '../endpoints/trade/trade-endpoint-helpers.ts'
 import { AlpacaTradeEndpoint } from '../endpoints/trade/trade-endpoint.ts'
 import { MarketDataEndpoint } from '../endpoints/market/market-endpoint.ts'
@@ -23,20 +23,20 @@ import { MetadataCache } from '../services/metadata-cache.service.ts'
  * It supports both paper and live trading environments, and can be extended with additional services
  * such as mapping and metadata caching for enhanced data handling.
  *
- * @param {AlpacaMarketClientConfig} config - Configuration options for the Alpaca client
+ * @param {AlpacaClientConfig} config - Configuration options for the Alpaca client
  * @returns {AlpacaMarketClient} - An instance of the Alpaca market client
  * @throws {AlpacaMarketError} - Throws an error if the configuration is invalid or required features are not enabled
  *
  * @example Basic Usage
  * ```typescript
- * import { AlpacaClient, createDefaultAlpacaConfig } from './alpaca-markets/mod.ts'
+ * import { AlpacaMarketClient, createDefaultAlpacaConfig } from './alpaca-markets/mod.ts'
  *
  * const config = createDefaultAlpacaConfig({
  *   apiKey: 'your-api-key',
  *   secretKey: 'your-secret-key'
  * }, 'paper')
  *
- * const client = new AlpacaClient(config)
+ * const client = new AlpacaMarketClient(config)
  *
  * // Trading API operations
  * const order = await client.trading.createOrder({
@@ -94,9 +94,10 @@ import { MetadataCache } from '../services/metadata-cache.service.ts'
  * ```
  */
 export class AlpacaMarketClient {
-  private readonly config: AlpacaMarketClientConfig
+  private readonly config: AlpacaClientConfig
   private readonly baseUrl: string
   private readonly dataUrl: string
+  private readonly debug: boolean
 
   private tradingEndpoint?: AlpacaTradeEndpoint
   private marketData: MarketDataEndpoint
@@ -108,27 +109,30 @@ export class AlpacaMarketClient {
   private _metadataCache?: MetadataCache
   private _mappingService?: MappingService
 
-  constructor(config: AlpacaMarketClientConfig) {
+  constructor(config: AlpacaClientConfig) {
     this.config = config
+    this.debug = config.debug ?? false
     this.baseUrl = config.baseUrl || this.getDefaultTradingBaseUrl(config.environment)
     this.dataUrl = config.dataUrl || this.getDefaultMarketDataUrl(config.environment)
 
     this.initializeAdvancedFeatures()
 
     this.marketData = new MarketDataEndpoint(this, this._mappingService)
-    /*console.debug('AlpacaClient initialized', {
-      environment: config.environment,
-      baseUrl: this.baseUrl,
-      dataUrl: this.dataUrl,
-      tradingEnabled: !!this.tradingClient,
-      streamingEnabled: !!this.streamingClient,
-      cacheEnabled: !!this.globalCache,
-      circuitBreakerEnabled: !!this.globalCircuitBreaker,
-      requestDeduplicationEnabled: !!this.requestDeduplicator,
-      connectionPoolEnabled: !!this.connectionPool,
-      mappingEnabled: !!this._mappingService,
-      metadataCacheEnabled: !!this._metadataCache,
-    })*/
+    if (this.debug) {
+      console.debug('AlpacaMarketClient initialized', {
+        environment: config.environment,
+        baseUrl: this.baseUrl,
+        dataUrl: this.dataUrl,
+        tradingEnabled: !!this.tradingEndpoint,
+        streamingEnabled: !!this.streamingClient,
+        cacheEnabled: !!this.globalCache,
+        circuitBreakerEnabled: !!this.globalCircuitBreaker,
+        requestDeduplicationEnabled: !!this.requestDeduplicator,
+        connectionPoolEnabled: !!this.connectionPool,
+        mappingEnabled: !!this._mappingService,
+        metadataCacheEnabled: !!this._metadataCache,
+      })
+    }
   }
 
   /**
@@ -323,23 +327,85 @@ export class AlpacaMarketClient {
    * This method checks if the trading, market data, and streaming APIs are reachable.
    * It returns an object indicating the connectivity status for each API.
    */
-  async testClientConnections(): Promise<{ trading: boolean; marketData: boolean; streaming: boolean }> {
+  async testClientConnections(): Promise<{ endpoints: { trading: boolean; marketData: boolean; streaming: boolean } }> {
+    const testId = `test-${Date.now()}`
+
+    if (this.debug) {
+      console.debug(`[AlpacaMarketClient] Starting connectivity test`, {
+        testId,
+        hasTradingEndpoint: !!this.tradingEndpoint,
+        hasCircuitBreaker: !!this.globalCircuitBreaker,
+        circuitBreakerState: this.globalCircuitBreaker?.getMetrics().state,
+      })
+    }
+
     const tradingTest = this.tradingEndpoint
-      ? this.tradingEndpoint.getAccount().then(() => true).catch(() => false)
+      ? this.tradingEndpoint.getAccount()
+        .then(() => {
+          if (this.debug) {
+            console.debug(`[AlpacaMarketClient] Trading test succeeded`, { testId })
+          }
+          return true
+        })
+        .catch((_error) => {
+          if (this.debug) {
+            console.debug(`[AlpacaMarketClient] Trading test failed`, {
+              testId,
+              error: _error instanceof Error ? _error.message : String(_error),
+            })
+          }
+          return false
+        })
       : Promise.resolve(false)
 
+    if (this.debug) {
+      console.debug(`[AlpacaMarketClient] Starting market data test`, { testId })
+    }
     const marketDataTest = this.marketData.getLatestBars({ symbols: ['NVDA'] })
-      .then(() => true)
-      .catch(() => false)
+      .then(() => {
+        if (this.debug) {
+          console.debug(`[AlpacaMarketClient] Market data test succeeded`, { testId })
+        }
+        return true
+      })
+      .catch((_error) => {
+        if (this.debug) {
+          console.debug(`[AlpacaMarketClient] Market data test failed`, {
+            testId,
+            error: _error instanceof Error ? _error.message : String(_error),
+          })
+        }
+        return false
+      })
 
     const streamingTest = Promise.resolve(this.isMarketStreamConnected())
 
-    const [trading, marketData, streaming] = await Promise.all([tradingTest, marketDataTest, streamingTest])
+    if (this.debug) {
+      console.debug(`[AlpacaMarketClient] Waiting for all tests to complete`, { testId })
+    }
 
-    return {
-      trading,
-      marketData,
-      streaming,
+    try {
+      const [trading, marketData, streaming] = await Promise.all([tradingTest, marketDataTest, streamingTest])
+      const results = {
+        endpoints: {
+          trading,
+          marketData,
+          streaming,
+        },
+      }
+
+      if (this.debug) {
+        console.debug(`[AlpacaMarketClient] Enabled endpoints:`, { testId, results })
+      }
+
+      return results
+    } catch (error) {
+      console.error(`[AlpacaMarketClient] Connectivity test failed with unhandled error`, {
+        testId,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      })
+      throw error
     }
   }
 
@@ -493,8 +559,8 @@ export class AlpacaMarketClient {
   ): Promise<T> {
     const { method, body, params } = options
     const url = new URL(endpoint, baseUrl)
+    const requestId = `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 
-    // Add query parameters
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -524,12 +590,6 @@ export class AlpacaMarketClient {
       requestOptions.body = JSON.stringify(body)
     }
 
-    console.debug('Executing request', {
-      method,
-      url: url.toString(),
-      hasBody: !!body,
-    })
-
     /** Get a connection from the pool if available */
     const getConnection = async (): Promise<{ id: string } | null> => {
       if (!this.connectionPool) {
@@ -541,6 +601,7 @@ export class AlpacaMarketClient {
         return { id: conn.id }
       } catch (error) {
         console.warn('Failed to get connection from pool', {
+          requestId,
           error: error instanceof Error ? error.message : String(error),
         })
         return null
@@ -559,6 +620,12 @@ export class AlpacaMarketClient {
 
         if (!response.ok) {
           const errorBody = await response.text()
+          console.warn(`[AlpacaMarketClient] HTTP error response`, {
+            requestId,
+            status: response.status,
+            statusText: response.statusText,
+            errorBody: errorBody.substring(0, 200), // Log first 200 chars
+          })
           throw new AlpacaMarketError(
             `HTTP ${response.status}: ${response.statusText}`,
             {
@@ -571,22 +638,34 @@ export class AlpacaMarketClient {
 
         const result = await response.json()
 
-        /*console.debug('Request completed successfully', {
-          method,
-          url: url.toString(),
-          status: response.status,
-          connectionId: connection?.id,
-        })*/
+        if (this.debug) {
+          console.debug(`[AlpacaMarketClient] Request completed successfully`, {
+            requestId,
+            method,
+            url: url.toString(),
+            status: response.status,
+            connectionId: connection?.id,
+            hasResult: !!result,
+          })
+        }
 
         return result as T
       } catch (error) {
-        // Release connection on error
+        if (this.debug) {
+          console.error(`[AlpacaMarketClient] Request failed`, {
+            requestId,
+            error: error instanceof Error ? error.message : String(error),
+            errorName: error instanceof Error ? error.name : 'Unknown',
+            connectionId: connection?.id,
+          })
+        }
+
         if (connection && this.connectionPool) {
           this.connectionPool.releaseConnection(connection.id)
         }
         throw AlpacaMarketErrorContext.enrichError(error, {
           operation: 'executeRequest',
-          metadata: { method, url: url.toString() },
+          metadata: { method, url: url.toString(), requestId },
         })
       }
     }
@@ -599,43 +678,8 @@ export class AlpacaMarketClient {
   /**
    * Get the Client configuration
    */
-  getConfig(): AlpacaMarketClientConfig {
+  getConfig(): AlpacaClientConfig {
     return { ...this.config }
-  }
-
-  /**
-   * Returns a basic logger with context sharing and child logging capabilities
-   *
-   * Logging methods include:
-   * - debug: For detailed debugging information
-   * - info: For general informational messages
-   * - warn: For warning messages that may indicate potential issues
-   * - error: For error messages that indicate failures or exceptions
-   * - child: For creating child loggers with additional context
-   */
-  getLogger() {
-    // TODO(@albedosehen): Move all of this into a utility module and expose the interface for the user in case they do not bring their own logger
-    interface AlpacaMarketLogger {
-      debug: (message: string, context?: Record<string, unknown>) => void
-      info: (message: string, context?: Record<string, unknown>) => void
-      warn: (message: string, context?: Record<string, unknown>) => void
-      error: (message: string, context?: Record<string, unknown>) => void
-      child: (context: Record<string, unknown>) => AlpacaMarketLogger
-    }
-
-    const createLogger = (prefix: string, baseContext: Record<string, unknown> = {}): AlpacaMarketLogger => ({
-      debug: (message: string, context?: Record<string, unknown>) =>
-        console.debug(`${prefix} ${message}`, { ...baseContext, ...(context || {}) }),
-      info: (message: string, context?: Record<string, unknown>) =>
-        console.info(`${prefix} ${message}`, { ...baseContext, ...(context || {}) }),
-      warn: (message: string, context?: Record<string, unknown>) =>
-        console.warn(`${prefix} ${message}`, { ...baseContext, ...(context || {}) }),
-      error: (message: string, context?: Record<string, unknown>) =>
-        console.error(`${prefix} ${message}`, { ...baseContext, ...(context || {}) }),
-      child: (childContext: Record<string, unknown>) => createLogger(prefix, { ...baseContext, ...childContext }),
-    })
-
-    return createLogger('[AlpacaClient]')
   }
 
   /**
@@ -645,8 +689,6 @@ export class AlpacaMarketClient {
    * It will clean up all resources, including all clients and their connections, and any other resources.
    */
   async dispose(): Promise<void> {
-    console.info('Disposing AlpacaClient')
-
     const cleanupTasks: Promise<void>[] = []
 
     if (this.tradingEndpoint) {
@@ -663,7 +705,7 @@ export class AlpacaMarketClient {
     }
 
     if (this.globalCircuitBreaker) {
-      this.globalCircuitBreaker.reset()
+      this.globalCircuitBreaker.dispose()
     }
 
     if (this.requestDeduplicator) {

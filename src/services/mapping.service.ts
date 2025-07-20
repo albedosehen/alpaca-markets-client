@@ -25,6 +25,8 @@ export interface MappingServiceConfig {
   readonly validateOutput: boolean
   /** Whether to cache enhancement results */
   readonly cacheEnhancements: boolean
+  /** Enable debug logging (default: false) */
+  readonly debug?: boolean
 }
 
 /**
@@ -45,11 +47,14 @@ const DEFAULT_CONFIG: MappingServiceConfig = {
  */
 export class MappingService {
   private readonly enhancementCache = new Map<string, TradeEnhanced>()
+  private readonly debug: boolean
 
   constructor(
     private readonly metadataCache: MetadataCache,
     private readonly config: MappingServiceConfig = DEFAULT_CONFIG,
-  ) {}
+  ) {
+    this.debug = config.debug ?? false
+  }
 
   /**
    * Enhance a single trade with metadata mappings
@@ -356,7 +361,9 @@ export class MappingService {
    */
   clearCache(): void {
     this.enhancementCache.clear()
-    console.debug('Enhancement cache cleared')
+    if (this.debug) {
+      console.debug('Enhancement cache cleared')
+    }
   }
 
   /**
@@ -376,11 +383,13 @@ export class MappingService {
     trade: Trade,
     config: TradeEnhancementConfig,
   ): Promise<TradeEnhanced> {
-    console.debug('Enhancing trade', {
-      symbol: trade.symbol,
-      tradeId: trade.tradeId,
-      config,
-    })
+    if (this.debug) {
+      console.debug('Enhancing trade', {
+        symbol: trade.symbol,
+        tradeId: trade.tradeId,
+        config,
+      })
+    }
 
     // Gather all mapping operations
     const exchangeOperation = config.includeExchangeNames
@@ -420,11 +429,13 @@ export class MappingService {
       ),
     }
 
-    console.debug('Trade enhanced successfully', {
-      symbol: trade.symbol,
-      tradeId: trade.tradeId,
-      hasMappings: enhanced.hasMappings,
-    })
+    if (this.debug) {
+      console.debug('Trade enhanced successfully', {
+        symbol: trade.symbol,
+        tradeId: trade.tradeId,
+        hasMappings: enhanced.hasMappings,
+      })
+    }
 
     return enhanced
   }
@@ -436,10 +447,12 @@ export class MappingService {
     quote: Quote,
     config: QuoteEnhancementConfig,
   ): Promise<QuoteEnhanced> {
-    console.debug('Enhancing quote', {
-      symbol: quote.symbol,
-      config,
-    })
+    if (this.debug) {
+      console.debug('Enhancing quote', {
+        symbol: quote.symbol,
+        config,
+      })
+    }
 
     // Gather all mapping operations
     const askExchangeOperation = config.includeExchangeNames && quote.askExchange
@@ -489,10 +502,12 @@ export class MappingService {
       ),
     }
 
-    console.debug('Quote enhanced successfully', {
-      symbol: quote.symbol,
-      hasMappings: enhanced.hasMappings,
-    })
+    if (this.debug) {
+      console.debug('Quote enhanced successfully', {
+        symbol: quote.symbol,
+        hasMappings: enhanced.hasMappings,
+      })
+    }
 
     return enhanced
   }

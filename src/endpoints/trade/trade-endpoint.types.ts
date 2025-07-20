@@ -5,6 +5,8 @@ import type { CircuitBreakerConfig } from '../../services/circuit-breaker.servic
  * Trading Client configuration options
  */
 export interface TradingClientConfig {
+  /** Enable debug logging (default: false) */
+  debug?: boolean
   cacheConfig?: {
     enabled: boolean
     maxSize?: number

@@ -25,6 +25,8 @@ export interface AlpacaClientConfig {
   maxRetries?: number
   /** Maximum number of retries for API requests */
   rateLimitBuffer?: number
+  /** Enable debug logging (default: false) */
+  debug?: boolean
   /** Trading client configuration */
   trading?: AlpacaTradingClientConfig
   /** WebSocket streaming configuration */

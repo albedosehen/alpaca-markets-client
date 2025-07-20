@@ -479,12 +479,12 @@ describe('AlpacaMarketClient', () => {
 
       const connectivityResult = await client.testClientConnections()
 
-      assertExists(connectivityResult.trading)
-      assertExists(connectivityResult.marketData)
-      assertExists(connectivityResult.streaming)
-      assertEquals(typeof connectivityResult.trading, 'boolean')
-      assertEquals(typeof connectivityResult.marketData, 'boolean')
-      assertEquals(typeof connectivityResult.streaming, 'boolean')
+      assertExists(connectivityResult.endpoints.trading)
+      assertExists(connectivityResult.endpoints.marketData)
+      assertExists(connectivityResult.endpoints.streaming)
+      assertEquals(typeof connectivityResult.endpoints.trading, 'boolean')
+      assertEquals(typeof connectivityResult.endpoints.marketData, 'boolean')
+      assertEquals(typeof connectivityResult.endpoints.streaming, 'boolean')
     })
   })
 

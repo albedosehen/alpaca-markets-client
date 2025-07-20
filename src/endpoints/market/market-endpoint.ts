@@ -66,13 +66,6 @@ export class MarketDataEndpoint {
    * @return {Promise<PaginatedResponse<Record<string, Bar[]>>>} The historical bars for the specified symbols.
    */
   async getBars(params: BarParams): Promise<PaginatedResponse<Record<string, Bar[]>>> {
-    const logger = this.client.getLogger().child({
-      requestId: 'getBars',
-      symbol: Array.isArray(params.symbols) ? params.symbols[0] : params.symbols,
-    })
-
-    logger.debug('Getting historical bars', { params })
-
     try {
       const response = await this.client.request<
         { value: { bars: Record<string, BarRaw[]>; next_page_token?: string } }
@@ -82,10 +75,9 @@ export class MarketDataEndpoint {
         useDataUrl: true,
       })
 
-      const result = this.transformBarsResponse(response, logger)
+      const result = this.transformBarsResponse(response)
       return result
     } catch (error) {
-      logger.error('API request failed', { error, params })
       throw AlpacaMarketErrorContext.enrichError(error, {
         operation: 'getBars',
         requestId: 'getBars',
@@ -101,13 +93,6 @@ export class MarketDataEndpoint {
    * @return {Promise<Record<string, Bar>>} The latest bars for the specified symbols.
    */
   async getLatestBars(params: LatestBarParams): Promise<Record<string, Bar>> {
-    const logger = this.client.getLogger().child({
-      requestId: 'getLatestBars',
-      symbol: Array.isArray(params.symbols) ? params.symbols[0] : params.symbols,
-    })
-
-    logger.debug('Getting latest bars', { params })
-
     try {
       const response = await this.client.request<{ bars: Record<string, BarRaw> }>(
         '/v2/stocks/bars/latest',
@@ -118,10 +103,9 @@ export class MarketDataEndpoint {
         },
       )
 
-      const result = this.transformLatestBarsResponse(response, logger)
+      const result = this.transformLatestBarsResponse(response)
       return result
     } catch (error) {
-      logger.error('API request failed', { error, params })
       throw AlpacaMarketErrorContext.enrichError(error, {
         operation: 'getLatestBars',
         requestId: 'getLatestBars',
@@ -137,13 +121,6 @@ export class MarketDataEndpoint {
    * @return {Promise<PaginatedResponse<Record<string, QuoteEnhanced[]>>>} The historical quotes for the specified symbols.
    */
   async getQuotes(params: QuoteParams): Promise<PaginatedResponse<Record<string, QuoteEnhanced[]>>> {
-    const logger = this.client.getLogger().child({
-      requestId: 'getQuotes',
-      symbol: Array.isArray(params.symbols) ? params.symbols[0] : params.symbols,
-    })
-
-    logger.debug('Getting historical quotes', { params })
-
     try {
       const response = await this.client.request<
         { value: { quotes: Record<string, QuoteResponse[]>; next_page_token?: string } }
@@ -153,15 +130,9 @@ export class MarketDataEndpoint {
         useDataUrl: true,
       })
 
-      const result = await this.transformQuotesResponse(response, logger)
+      const result = await this.transformQuotesResponse(response)
       return result
     } catch (error) {
-      logger.error('API request failed', {
-        error: error instanceof Error ? error.message : String(error),
-        errorStack: error instanceof Error ? error.stack : undefined,
-        params,
-        requestParams: this.buildQuoteParams(params),
-      })
       throw AlpacaMarketErrorContext.enrichError(error, {
         operation: 'getQuotes',
         requestId: 'getQuotes',
@@ -177,13 +148,6 @@ export class MarketDataEndpoint {
    * @return {Promise<Record<string, QuoteEnhanced>>} The latest quotes for the specified symbols.
    */
   async getLatestQuotes(params: LatestQuoteParams): Promise<Record<string, QuoteEnhanced>> {
-    const logger = this.client.getLogger().child({
-      requestId: 'getLatestQuotes',
-      symbol: Array.isArray(params.symbols) ? params.symbols[0] : params.symbols,
-    })
-
-    logger.debug('Getting latest quotes', { params })
-
     try {
       const response = await this.client.request<{ value: { quotes: Record<string, QuoteResponse> } }>(
         '/v2/stocks/quotes/latest',
@@ -194,14 +158,9 @@ export class MarketDataEndpoint {
         },
       )
 
-      const result = await this.transformLatestQuotesResponse(response, logger)
+      const result = await this.transformLatestQuotesResponse(response)
       return result
     } catch (error) {
-      logger.error('Transform latest quotes response failed', {
-        error: error instanceof Error ? error.message : String(error),
-        errorStack: error instanceof Error ? error.stack : undefined,
-        params,
-      })
       throw AlpacaMarketErrorContext.enrichError(error, {
         operation: 'getLatestQuotes',
         requestId: 'getLatestQuotes',
@@ -217,13 +176,6 @@ export class MarketDataEndpoint {
    * @returns {Promise<PaginatedResponse<Record<string, TradeEnhanced[]>>>} The historical trades for the specified symbols.
    */
   async getTrades(params: TradeParams): Promise<PaginatedResponse<Record<string, TradeEnhanced[]>>> {
-    const logger = this.client.getLogger().child({
-      requestId: 'getTrades',
-      symbol: Array.isArray(params.symbols) ? params.symbols[0] : params.symbols,
-    })
-
-    logger.debug('Getting historical trades', { params })
-
     try {
       const response = await this.client.request<
         { value: { trades: Record<string, TradeRaw[]>; next_page_token?: string } }
@@ -233,23 +185,9 @@ export class MarketDataEndpoint {
         useDataUrl: true,
       })
 
-      // Log the raw API response before transformation
-      logger.debug('Raw API response received', {
-        responseType: typeof response,
-        responseKeys: response ? Object.keys(response) : 'null/undefined',
-        hasTradesField: response && 'trades' in response,
-        requestParams: this.buildTradeParams(params),
-      })
-
-      const result = await this.transformTradesResponse(response, logger)
+      const result = await this.transformTradesResponse(response)
       return result
     } catch (error) {
-      logger.error('Transform trades response failed', {
-        error: error instanceof Error ? error.message : String(error),
-        errorStack: error instanceof Error ? error.stack : undefined,
-        params,
-        requestParams: this.buildTradeParams(params),
-      })
       throw AlpacaMarketErrorContext.enrichError(error, {
         operation: 'getTrades',
         requestId: 'getTrades',
@@ -265,13 +203,6 @@ export class MarketDataEndpoint {
    * @returns {Promise<Record<string, TradeEnhanced>>} The latest trades for the specified symbols.
    */
   async getLatestTrades(params: LatestTradeParams): Promise<Record<string, TradeEnhanced>> {
-    const logger = this.client.getLogger().child({
-      requestId: 'getLatestTrades',
-      symbol: Array.isArray(params.symbols) ? params.symbols[0] : params.symbols,
-    })
-
-    logger.debug('Getting latest trades', { params })
-
     try {
       const response = await this.client.request<{ value: { trades: Record<string, TradeRaw> } }>(
         '/v2/stocks/trades/latest',
@@ -282,14 +213,9 @@ export class MarketDataEndpoint {
         },
       )
 
-      const result = await this.transformLatestTradesResponse(response, logger)
+      const result = await this.transformLatestTradesResponse(response)
       return result
     } catch (error) {
-      logger.error('Transform latest trades response failed', {
-        error: error instanceof Error ? error.message : String(error),
-        errorStack: error instanceof Error ? error.stack : undefined,
-        params,
-      })
       throw AlpacaMarketErrorContext.enrichError(error, {
         operation: 'getLatestTrades',
         requestId: 'getLatestTrades',
@@ -309,16 +235,7 @@ export class MarketDataEndpoint {
     params: TradeParams,
     config?: Partial<TradeEnhancementConfig>,
   ): Promise<PaginatedResponse<Record<string, TradeEnhanced[]>>> {
-    const logger = this.client.getLogger().child({
-      requestId: 'getTradesEnhanced',
-      symbol: Array.isArray(params.symbols) ? params.symbols[0] : params.symbols,
-    })
-
-    logger.debug('Getting enhanced historical trades', { params, config })
-
-    // If no mapping service available, fall back to regular trades
     if (!this.mappingService) {
-      logger.warn('No mapping service available, falling back to regular trades')
       const { data, nextPageToken } = await this.getTrades(params)
 
       if (!data) {
@@ -328,7 +245,6 @@ export class MarketDataEndpoint {
         }
       }
 
-      // Convert regular trades to enhanced format without mappings
       const enhancedData: Record<string, TradeEnhanced[]> = {}
       for (const [symbol, trades] of Object.entries(data)) {
         enhancedData[symbol] = trades.map((trade) => ({
@@ -355,10 +271,9 @@ export class MarketDataEndpoint {
         useDataUrl: true,
       })
 
-      const result = await this.transformTradesEnhancedResponse(response, logger, config)
+      const result = await this.transformTradesEnhancedResponse(response, config)
       return result
     } catch (error) {
-      logger.error('API request failed', { error, params })
       throw AlpacaMarketErrorContext.enrichError(error, {
         operation: 'getTradesEnhanced',
         requestId: 'getTradesEnhanced',
@@ -378,16 +293,8 @@ export class MarketDataEndpoint {
     params: LatestTradeParams,
     config?: Partial<TradeEnhancementConfig>,
   ): Promise<Record<string, TradeEnhanced>> {
-    const logger = this.client.getLogger().child({
-      requestId: 'getLatestTradesEnhanced',
-      symbol: Array.isArray(params.symbols) ? params.symbols[0] : params.symbols,
-    })
-
-    logger.debug('Getting enhanced latest trades', { params, config })
-
     // If no mapping service available, fall back to regular trades
     if (!this.mappingService) {
-      logger.warn('No mapping service available, falling back to regular trades')
       const trades = await this.getLatestTrades(params)
 
       // Convert regular trades to enhanced format without mappings
@@ -415,10 +322,9 @@ export class MarketDataEndpoint {
         },
       )
 
-      const result = await this.transformLatestTradesEnhancedResponse(response, logger, config)
+      const result = await this.transformLatestTradesEnhancedResponse(response, config)
       return result
     } catch (error) {
-      logger.error('API request failed', { error, params })
       throw AlpacaMarketErrorContext.enrichError(error, {
         operation: 'getLatestTradesEnhanced',
         requestId: 'getLatestTradesEnhanced',
@@ -547,14 +453,8 @@ export class MarketDataEndpoint {
    */
   private transformBarsResponse(
     response: { value: { bars: Record<string, BarRaw[]>; next_page_token?: string } },
-    logger: ReturnType<AlpacaMarketClient['getLogger']>,
   ): PaginatedResponse<Record<string, Bar[]>> {
-    // Check if response.value.bars exists and is not null/undefined
     if (!response?.value?.bars) {
-      logger.warn('Response bars field is null, undefined, or missing', {
-        response,
-        barsField: response?.value,
-      })
       return {
         data: {},
         nextPageToken: response?.value?.next_page_token,
@@ -566,11 +466,6 @@ export class MarketDataEndpoint {
     for (const [symbol, rawBars] of Object.entries(response.value.bars)) {
       transformedBars[symbol] = rawBars.map((rawBar) => mapBarRawToBar(rawBar, symbol))
     }
-
-    logger.debug('Transformed bars response', {
-      symbolCount: Object.keys(transformedBars).length,
-      totalBars: Object.values(transformedBars).reduce((sum, bars) => sum + bars.length, 0),
-    })
 
     return {
       data: transformedBars,
@@ -587,14 +482,8 @@ export class MarketDataEndpoint {
    */
   private transformLatestBarsResponse(
     response: { bars: Record<string, BarRaw> },
-    logger: ReturnType<AlpacaMarketClient['getLogger']>,
   ): Record<string, Bar> {
-    // Check if response.bars exists and is not null/undefined
     if (!response?.bars) {
-      logger.warn('Response bars field is null, undefined, or missing', {
-        response,
-        barsField: response?.bars,
-      })
       return {}
     }
 
@@ -603,10 +492,6 @@ export class MarketDataEndpoint {
     for (const [symbol, rawBar] of Object.entries(response.bars)) {
       transformedBars[symbol] = mapBarRawToBar(rawBar, symbol)
     }
-
-    logger.debug('Transformed latest bars response', {
-      symbolCount: Object.keys(transformedBars).length,
-    })
 
     return transformedBars
   }
@@ -620,14 +505,8 @@ export class MarketDataEndpoint {
    */
   private async transformQuotesResponse(
     response: { value: { quotes: Record<string, QuoteResponse[]>; next_page_token?: string } },
-    logger: ReturnType<AlpacaMarketClient['getLogger']>,
   ): Promise<PaginatedResponse<Record<string, QuoteEnhanced[]>>> {
-    // Check if response.value.quotes exists and is not null/undefined
     if (!response?.value?.quotes) {
-      logger.warn('Response quotes field is null, undefined, or missing', {
-        response,
-        quotesField: response?.value?.quotes,
-      })
       return {
         data: {},
         nextPageToken: response?.value?.next_page_token,
@@ -636,11 +515,6 @@ export class MarketDataEndpoint {
 
     // Use the enhanced mapper with mapping service
     const enhancedQuotes = await mapQuotesRawToQuotesEnhanced(response.value.quotes, this.mappingService)
-
-    logger.debug('Transformed quotes response', {
-      symbolCount: Object.keys(enhancedQuotes).length,
-      totalQuotes: Object.values(enhancedQuotes).reduce((sum, quotes) => sum + quotes.length, 0),
-    })
 
     return {
       data: enhancedQuotes,
@@ -657,18 +531,11 @@ export class MarketDataEndpoint {
    */
   private async transformLatestQuotesResponse(
     response: { value: { quotes: Record<string, QuoteResponse> } },
-    logger: ReturnType<AlpacaMarketClient['getLogger']>,
   ): Promise<Record<string, QuoteEnhanced>> {
-    // Check if response.value.quotes exists and is not null/undefined
     if (!response?.value?.quotes) {
-      logger.warn('Response quotes field is null, undefined, or missing', {
-        response,
-        quotesField: response?.value?.quotes,
-      })
       return {}
     }
 
-    // Convert single quotes to arrays for batch processing, then extract
     const quotesAsArrays: Record<string, QuoteResponse[]> = {}
     for (const [symbol, quote] of Object.entries(response.value.quotes)) {
       quotesAsArrays[symbol] = [quote]
@@ -676,17 +543,12 @@ export class MarketDataEndpoint {
 
     const enhancedQuotesArrays = await mapQuotesRawToQuotesEnhanced(quotesAsArrays, this.mappingService)
 
-    // Extract single quotes from arrays
     const enhancedQuotes: Record<string, QuoteEnhanced> = {}
     for (const [symbol, quotesArray] of Object.entries(enhancedQuotesArrays)) {
       if (quotesArray.length > 0) {
         enhancedQuotes[symbol] = quotesArray[0]
       }
     }
-
-    logger.debug('Transformed latest quotes response', {
-      symbolCount: Object.keys(enhancedQuotes).length,
-    })
 
     return enhancedQuotes
   }
@@ -700,27 +562,8 @@ export class MarketDataEndpoint {
    */
   private async transformTradesResponse(
     response: { value: { trades: Record<string, TradeRaw[]>; next_page_token?: string } },
-    logger: ReturnType<AlpacaMarketClient['getLogger']>,
   ): Promise<PaginatedResponse<Record<string, TradeEnhanced[]>>> {
-    // DIAGNOSTIC: Log the exact response structure received
-    logger.debug('transformTradesResponse received', {
-      responseType: typeof response,
-      responseKeys: response ? Object.keys(response) : 'null/undefined',
-      hasTradesField: response && 'value' in response && 'trades' in response.value,
-      hasValueField: response && 'value' in response,
-    })
-
-    // Check if response.value.trades exists and is not null/undefined
     if (!response?.value?.trades) {
-      logger.warn('Response trades field is null, undefined, or missing - returning empty result', {
-        response,
-        tradesField: response?.value?.trades,
-        reason: response?.value?.trades === null
-          ? 'null'
-          : response?.value?.trades === undefined
-          ? 'undefined'
-          : 'missing',
-      })
       return {
         data: {},
         nextPageToken: response?.value?.next_page_token,
@@ -729,11 +572,6 @@ export class MarketDataEndpoint {
 
     // Use the enhanced mapper with mapping service
     const enhancedTrades = await mapTradesRawToTradesEnhanced(response.value.trades, this.mappingService)
-
-    logger.debug('Transformed trades response', {
-      symbolCount: Object.keys(enhancedTrades).length,
-      totalTrades: Object.values(enhancedTrades).reduce((sum, trades) => sum + trades.length, 0),
-    })
 
     return {
       data: enhancedTrades,
@@ -750,18 +588,11 @@ export class MarketDataEndpoint {
    */
   private async transformLatestTradesResponse(
     response: { value: { trades: Record<string, TradeRaw> } },
-    logger: ReturnType<AlpacaMarketClient['getLogger']>,
   ): Promise<Record<string, TradeEnhanced>> {
-    // Check if response.value.trades exists and is not null/undefined
     if (!response?.value?.trades) {
-      logger.warn('Response trades field is null, undefined, or missing', {
-        response,
-        tradesField: response?.value?.trades,
-      })
       return {}
     }
 
-    // Convert single trades to arrays for batch processing, then extract
     const tradesAsArrays: Record<string, TradeRaw[]> = {}
     for (const [symbol, trade] of Object.entries(response.value.trades)) {
       tradesAsArrays[symbol] = [trade]
@@ -769,17 +600,12 @@ export class MarketDataEndpoint {
 
     const enhancedTradesArrays = await mapTradesRawToTradesEnhanced(tradesAsArrays, this.mappingService)
 
-    // Extract single trades from arrays
     const enhancedTrades: Record<string, TradeEnhanced> = {}
     for (const [symbol, tradesArray] of Object.entries(enhancedTradesArrays)) {
       if (tradesArray.length > 0) {
         enhancedTrades[symbol] = tradesArray[0]
       }
     }
-
-    logger.debug('Transformed latest trades response', {
-      symbolCount: Object.keys(enhancedTrades).length,
-    })
 
     return enhancedTrades
   }
@@ -791,7 +617,6 @@ export class MarketDataEndpoint {
    */
   private async transformTradesEnhancedResponse(
     response: { value: { trades: Record<string, TradeRaw[]>; next_page_token?: string } },
-    logger: ReturnType<AlpacaMarketClient['getLogger']>,
     config?: Partial<TradeEnhancementConfig>,
   ): Promise<PaginatedResponse<Record<string, TradeEnhanced[]>>> {
     if (!response.value.trades) {
@@ -801,13 +626,7 @@ export class MarketDataEndpoint {
       }
     }
 
-    // Use the enhanced mapper with mapping service
     const enhancedTrades = await mapTradesRawToTradesEnhanced(response.value.trades, this.mappingService, config)
-
-    logger.debug('Transformed enhanced trades response', {
-      symbolCount: Object.keys(enhancedTrades).length,
-      totalTrades: Object.values(enhancedTrades).reduce((sum, trades) => sum + trades.length, 0),
-    })
 
     return {
       data: enhancedTrades,
@@ -822,14 +641,12 @@ export class MarketDataEndpoint {
    */
   private async transformLatestTradesEnhancedResponse(
     response: { value: { trades: Record<string, TradeRaw> } },
-    logger: ReturnType<AlpacaMarketClient['getLogger']>,
     config?: Partial<TradeEnhancementConfig>,
   ): Promise<Record<string, TradeEnhanced>> {
     if (!response.value.trades) {
       return {}
     }
 
-    // Convert single trades to arrays for batch processing, then extract
     const tradesAsArrays: Record<string, TradeRaw[]> = {}
     for (const [symbol, trade] of Object.entries(response.value.trades)) {
       tradesAsArrays[symbol] = [trade]
@@ -837,17 +654,12 @@ export class MarketDataEndpoint {
 
     const enhancedTradesArrays = await mapTradesRawToTradesEnhanced(tradesAsArrays, this.mappingService, config)
 
-    // Extract single trades from arrays
     const enhancedTrades: Record<string, TradeEnhanced> = {}
     for (const [symbol, tradesArray] of Object.entries(enhancedTradesArrays)) {
       if (tradesArray.length > 0) {
         enhancedTrades[symbol] = tradesArray[0]
       }
     }
-
-    logger.debug('Transformed enhanced latest trades response', {
-      symbolCount: Object.keys(enhancedTrades).length,
-    })
 
     return enhancedTrades
   }

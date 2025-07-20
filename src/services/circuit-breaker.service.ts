@@ -18,23 +18,14 @@ export const CIRCUIT_BREAKER_STATE = {
  */
 export type CircuitBreakerState = typeof CIRCUIT_BREAKER_STATE[keyof typeof CIRCUIT_BREAKER_STATE]
 
-/**
- * Logger interface for circuit breaker operations
- */
-interface Logger {
-  child(context: Record<string, unknown>): Logger
-  debug(message: string, context?: Record<string, unknown>): void
-  info(message: string, context?: Record<string, unknown>): void
-  warn(message: string, context?: Record<string, unknown>): void
-  error(message: string, context?: Record<string, unknown>): void
-}
-
 export interface CircuitBreakerConfig {
   failureThreshold: number
   timeoutMs: number
   recoveryTimeoutMs: number
   halfOpenMaxAttempts?: number
   resetTimeoutMs?: number
+  /** Enable debug logging (default: false) */
+  debug?: boolean
 }
 
 export interface CircuitBreakerMetrics {
@@ -53,7 +44,6 @@ export interface CircuitBreakerMetrics {
  * during periods of high failure rates.
  *
  * @param {CircuitBreakerConfig} config - Configuration for the circuit breaker
- * @param {Logger} [logger] - Optional logger for circuit breaker events
  * @param {string} [name='CircuitBreaker'] - Name for the circuit breaker instance
  * @throws {AlpacaMarketError} - Throws an error if the circuit breaker is open or in an invalid state
  *
@@ -82,11 +72,14 @@ export class CircuitBreaker {
   private stateChangedAt = Date.now()
   private halfOpenAttempts = 0
   private resetTimeout?: number
+  private readonly debug: boolean
 
   constructor(
     private readonly config: CircuitBreakerConfig,
     private readonly name: string = 'CircuitBreaker',
-  ) {}
+  ) {
+    this.debug = config.debug ?? false
+  }
 
   /**
    * Execute a function with circuit breaker protection
@@ -198,10 +191,29 @@ export class CircuitBreaker {
    */
   private async executeWithTracking<T>(fn: () => Promise<T>): Promise<T> {
     this.totalAttempts++
+    const executionId = `${this.name}-${this.totalAttempts}-${Date.now()}`
 
     let timeoutId: number | undefined
+    // let timeoutFired = false // used for timeout tracking
+
     const timeoutPromise = new Promise<never>((_, reject) => {
+      if (this.debug) {
+        console.debug(`[CircuitBreaker-${this.name}] Creating timeout promise`, {
+          executionId,
+          timeoutMs: this.config.timeoutMs,
+        })
+      }
+
       timeoutId = setTimeout(() => {
+        // timeoutFired = true
+        if (this.debug) {
+          console.warn(`[CircuitBreaker-${this.name}] Timeout fired`, {
+            executionId,
+            timeoutMs: this.config.timeoutMs,
+            timeoutId,
+          })
+        }
+
         reject(AlpacaMarketErrorContext.timeoutError(
           `Circuit breaker timeout after ${this.config.timeoutMs}ms`,
           this.config.timeoutMs,
@@ -210,25 +222,72 @@ export class CircuitBreaker {
             metadata: {
               circuitBreakerName: this.name,
               timeoutMs: this.config.timeoutMs,
+              executionId,
             },
           },
         ))
       }, this.config.timeoutMs)
+
+      if (this.debug) {
+        console.debug(`[CircuitBreaker-${this.name}] Timeout scheduled`, {
+          executionId,
+          timeoutId,
+        })
+      }
     })
+
+    if (this.debug) {
+      console.debug(`[CircuitBreaker-${this.name}] Starting Promise.race`, {
+        executionId,
+        timeoutId,
+      })
+    }
 
     try {
       const result = await Promise.race([
         fn(),
         timeoutPromise,
       ])
+
+      if (this.debug) {
+        console.debug(`[CircuitBreaker-${this.name}] Promise.race resolved successfully`, {
+          executionId,
+          timeoutId,
+          // timeoutFired,
+        })
+      }
+
       // Clear timeout if function completes before timeout
       if (timeoutId !== undefined) {
+        if (this.debug) {
+          console.debug(`[CircuitBreaker-${this.name}] Clearing timeout (success)`, {
+            executionId,
+            timeoutId,
+            // timeoutFired,
+          })
+        }
         clearTimeout(timeoutId)
       }
       return result
     } catch (error) {
+      if (this.debug) {
+        console.warn(`[CircuitBreaker-${this.name}] Promise.race rejected`, {
+          executionId,
+          timeoutId,
+          // timeoutFired,
+          error: error instanceof Error ? error.message : String(error),
+        })
+      }
+
       // Clear timeout on error as well
       if (timeoutId !== undefined) {
+        if (this.debug) {
+          console.debug(`[CircuitBreaker-${this.name}] Clearing timeout (error)`, {
+            executionId,
+            timeoutId,
+            // timeoutFired,
+          })
+        }
         clearTimeout(timeoutId)
       }
       throw AlpacaMarketErrorContext.enrichError(
@@ -238,6 +297,7 @@ export class CircuitBreaker {
           metadata: {
             circuitBreakerName: this.name,
             totalAttempts: this.totalAttempts,
+            executionId,
           },
         },
         'circuit_breaker',
@@ -258,11 +318,13 @@ export class CircuitBreaker {
       this.transitionToClosed()
     }
 
-    console.debug('Circuit breaker success recorded', {
-      state: this.state,
-      successCount: this.successCount,
-      failureCount: this.failureCount,
-    })
+    if (this.debug) {
+      console.debug('Circuit breaker success recorded', {
+        state: this.state,
+        successCount: this.successCount,
+        failureCount: this.failureCount,
+      })
+    }
   }
 
   /**
@@ -280,11 +342,13 @@ export class CircuitBreaker {
       this.transitionToOpen()
     }
 
-    console.warn('Circuit breaker failure recorded', {
-      state: this.state,
-      failureCount: this.failureCount,
-      failureThreshold: this.config.failureThreshold,
-    })
+    if (this.debug) {
+      console.warn('Circuit breaker failure recorded', {
+        state: this.state,
+        failureCount: this.failureCount,
+        failureThreshold: this.config.failureThreshold,
+      })
+    }
   }
 
   /**
@@ -295,7 +359,7 @@ export class CircuitBreaker {
    * @private
    */
   private transitionToClosed(): void {
-    const previousState = this.state
+    // const previousState = this.state
     this.state = CIRCUIT_BREAKER_STATE.Closed
     this.failureCount = 0
     this.halfOpenAttempts = 0
@@ -303,11 +367,13 @@ export class CircuitBreaker {
 
     this.scheduleReset()
 
-    console.info('Circuit breaker transitioned to CLOSED', {
-      previousState,
-      newState: this.state,
-      successCount: this.successCount,
-    })
+    if (this.debug) {
+      console.info('Circuit breaker transitioned to CLOSED', {
+        // previousState,
+        newState: this.state,
+        successCount: this.successCount,
+      })
+    }
   }
 
   /**
@@ -318,18 +384,20 @@ export class CircuitBreaker {
    * @private
    */
   private transitionToOpen(): void {
-    const previousState = this.state
+    // const previousState = this.state
     this.state = CIRCUIT_BREAKER_STATE.Open
     this.halfOpenAttempts = 0
     this.stateChangedAt = Date.now()
 
-    console.error('Circuit breaker transitioned to OPEN', {
-      previousState,
-      newState: this.state,
-      failureCount: this.failureCount,
-      failureThreshold: this.config.failureThreshold,
-      recoveryTimeoutMs: this.config.recoveryTimeoutMs,
-    })
+    if (this.debug) {
+      console.error('Circuit breaker transitioned to OPEN', {
+        // previousState,
+        newState: this.state,
+        failureCount: this.failureCount,
+        failureThreshold: this.config.failureThreshold,
+        recoveryTimeoutMs: this.config.recoveryTimeoutMs,
+      })
+    }
   }
 
   /**
@@ -340,16 +408,18 @@ export class CircuitBreaker {
    * @private
    */
   private transitionToHalfOpen(): void {
-    const previousState = this.state
+    // const previousState = this.state
     this.state = CIRCUIT_BREAKER_STATE.HalfOpen
     this.halfOpenAttempts = 0
     this.stateChangedAt = Date.now()
 
-    console.info('Circuit breaker transitioned to HALF_OPEN', {
-      previousState,
-      newState: this.state,
-      maxAttempts: this.config.halfOpenMaxAttempts || 1,
-    })
+    if (this.debug) {
+      console.info('Circuit breaker transitioned to HALF_OPEN', {
+        // previousState,
+        newState: this.state,
+        maxAttempts: this.config.halfOpenMaxAttempts || 1,
+      })
+    }
   }
 
   /**
@@ -386,9 +456,11 @@ export class CircuitBreaker {
       this.failureCount = 0
     }
 
-    console.debug('Circuit breaker metrics reset', {
-      state: this.state,
-    })
+    if (this.debug) {
+      console.debug('Circuit breaker metrics reset', {
+        state: this.state,
+      })
+    }
   }
 
   /**
@@ -426,14 +498,16 @@ export class CircuitBreaker {
    * ```
    */
   forceState(state: CircuitBreakerState): void {
-    const previousState = this.state
+    // const previousState = this.state
     this.state = state
     this.stateChangedAt = Date.now()
 
-    console.warn('Circuit breaker state forced', {
-      previousState,
-      newState: state,
-    })
+    if (this.debug) {
+      console.warn('Circuit breaker state forced', {
+        // previousState,
+        newState: state,
+      })
+    }
   }
 
   /**
@@ -454,7 +528,22 @@ export class CircuitBreaker {
       this.resetTimeout = undefined
     }
 
-    console.info('Circuit breaker reset to initial state')
+    if (this.debug) {
+      console.info('Circuit breaker reset to initial state')
+    }
+  }
+
+  /**
+   * Dispose circuit breaker and cleanup all timers
+   */
+  dispose(): void {
+    if (this.resetTimeout) {
+      clearTimeout(this.resetTimeout)
+      this.resetTimeout = undefined
+    }
+    if (this.debug) {
+      console.info('Circuit breaker disposed and timers cleared')
+    }
   }
 }
 

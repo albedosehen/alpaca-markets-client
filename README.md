@@ -1,7 +1,5 @@
 # Alpaca Markets Client 🦙
 
----
-
 **A client library for the Alpaca Markets API, providing access to trading, market data, and account management functionalities.**
 
 ## Features
@@ -30,7 +28,10 @@ const config = createDefaultAlpacaConfig({
 const client = new AlpacaMarketClient(config)
 
 // Test the connections
-await client.testClientConnections()
+const enabledEndpoints = await client.testClientConnections()
+
+console.log('Enabled endpoints:', enabledEndpoints)
+// Output: { endpoints: { trading: true, marketData: true, streaming: false } }
 ```
 
 ### Trading Operations

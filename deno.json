@@ -1,7 +1,7 @@
 {
 	"lock": true,
 
-	"name": "@albedosehen/alpaca-market-client",
+	"name": "@albedosehen/alpaca-markets-client",
 	"version": "0.1.0",
 	"license": "MIT",
 	"exports": "./mod.ts",

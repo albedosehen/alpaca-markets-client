@@ -13,6 +13,8 @@ export interface MetadataCacheConfig {
   readonly useFallbackDefaults: boolean
   /** Maximum retry attempts for API calls */
   readonly maxRetries: number
+  /** Enable debug logging (default: false) */
+  readonly debug?: boolean
 }
 
 /**
@@ -40,6 +42,7 @@ export class MetadataCache {
   private readonly tapeCodeCache = new Map<string, CacheEntry<TapeCodeMappings>>()
   private readonly conditionCache = new Map<string, CacheEntry<TradeConditionMappings>>()
   private readonly exchangeCache = new Map<string, CacheEntry<ExchangeMappings>>()
+  private readonly debug: boolean
 
   // Track ongoing API calls to prevent duplicates
   private readonly pendingTapeCalls = new Map<string, Promise<TapeCodeMappings>>()
@@ -48,7 +51,9 @@ export class MetadataCache {
 
   constructor(
     private readonly config: MetadataCacheConfig = DEFAULT_CONFIG,
-  ) {}
+  ) {
+    this.debug = config.debug ?? false
+  }
 
   /**
    * Get tape code mappings with caching
@@ -59,17 +64,21 @@ export class MetadataCache {
 
     // Return cached data if valid
     if (cached && Date.now() < cached.expiresAt) {
-      console.debug('Tape codes served from cache', {
-        fetchedAt: new Date(cached.fetchedAt),
-        expiresAt: new Date(cached.expiresAt),
-      })
+      if (this.debug) {
+        console.debug('Tape codes served from cache', {
+          fetchedAt: new Date(cached.fetchedAt),
+          expiresAt: new Date(cached.expiresAt),
+        })
+      }
       return cached.data
     }
 
     // Check if there's already a pending API call
     const existingCall = this.pendingTapeCalls.get(cacheKey)
     if (existingCall) {
-      console.debug('Tape codes request already in progress, waiting...', { cacheKey })
+      if (this.debug) {
+        console.debug('Tape codes request already in progress, waiting...', { cacheKey })
+      }
       return await existingCall
     }
 
@@ -85,18 +94,22 @@ export class MetadataCache {
 
     // Return cached data if valid
     if (cached && Date.now() < cached.expiresAt) {
-      console.debug('Trade conditions served from cache', {
-        tickType,
-        fetchedAt: new Date(cached.fetchedAt),
-        expiresAt: new Date(cached.expiresAt),
-      })
+      if (this.debug) {
+        console.debug('Trade conditions served from cache', {
+          tickType,
+          fetchedAt: new Date(cached.fetchedAt),
+          expiresAt: new Date(cached.expiresAt),
+        })
+      }
       return cached.data
     }
 
     // Check if there's already a pending API call
     const existingCall = this.pendingConditionCalls.get(cacheKey)
     if (existingCall) {
-      console.debug('Trade conditions request already in progress, waiting...', { tickType })
+      if (this.debug) {
+        console.debug('Trade conditions request already in progress, waiting...', { tickType })
+      }
       return await existingCall
     }
 
@@ -112,17 +125,21 @@ export class MetadataCache {
 
     // Return cached data if valid
     if (cached && Date.now() < cached.expiresAt) {
-      console.debug('Exchanges served from cache', {
-        fetchedAt: new Date(cached.fetchedAt),
-        expiresAt: new Date(cached.expiresAt),
-      })
+      if (this.debug) {
+        console.debug('Exchanges served from cache', {
+          fetchedAt: new Date(cached.fetchedAt),
+          expiresAt: new Date(cached.expiresAt),
+        })
+      }
       return cached.data
     }
 
     // Check if there's already a pending API call
     const existingCall = this.pendingExchangeCalls.get(cacheKey)
     if (existingCall) {
-      console.debug('Exchanges request already in progress, waiting...')
+      if (this.debug) {
+        console.debug('Exchanges request already in progress, waiting...')
+      }
       return await existingCall
     }
 
@@ -136,7 +153,9 @@ export class MetadataCache {
     this.tapeCodeCache.clear()
     this.conditionCache.clear()
     this.exchangeCache.clear()
-    console.debug('Metadata cache cleared')
+    if (this.debug) {
+      console.debug('Metadata cache cleared')
+    }
   }
 
   /**

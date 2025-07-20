@@ -51,6 +51,7 @@ export class AlpacaMarketStreamEndpoint {
   private reconnectTimer?: number
   private pingTimer?: number
   private connectionTimer?: number
+  private readonly debug: boolean
   private metrics = {
     connectTime: undefined as number | undefined,
     lastMessageTime: undefined as number | undefined,
@@ -63,7 +64,9 @@ export class AlpacaMarketStreamEndpoint {
     private readonly config: AlpacaClientConfig,
     private readonly wsConfig: WebSocketConfig,
     private readonly eventHandlers: WebSocketEventHandlers,
-  ) {}
+  ) {
+    this.debug = config.debug ?? false
+  }
 
   /**
    * Connect to WebSocket
@@ -120,7 +123,9 @@ export class AlpacaMarketStreamEndpoint {
       if (this.state === WS_CONNECTION_STATE.Connected) {
         await this.sendSubscription(config)
       } else {
-        console.debug('Subscription queued', { config, subscriptionId })
+        if (this.debug) {
+          console.debug('Subscription queued', { config, subscriptionId })
+        }
       }
     } catch (error) {
       throw AlpacaMarketErrorContext.enrichError(
@@ -145,7 +150,9 @@ export class AlpacaMarketStreamEndpoint {
       if (this.state === WS_CONNECTION_STATE.Connected) {
         await this.sendUnsubscription(config)
       } else {
-        console.debug('Unsubscription queued', { config, subscriptionId })
+        if (this.debug) {
+          console.debug('Unsubscription queued', { config, subscriptionId })
+        }
       }
     } catch (error) {
       throw AlpacaMarketErrorContext.enrichError(
@@ -200,7 +207,9 @@ export class AlpacaMarketStreamEndpoint {
     this.subscriptions.clear()
     this.messageQueue.length = 0
     this.setState(WS_CONNECTION_STATE.Disconnected)
-    console.debug('WebSocket client disposed')
+    if (this.debug) {
+      console.debug('WebSocket client disposed')
+    }
   }
 
   /**
@@ -378,7 +387,9 @@ export class AlpacaMarketStreamEndpoint {
       const messageStr = JSON.stringify(message)
       this.ws.send(messageStr)
       this.metrics.messagesSent++
-      console.debug('WebSocket message sent', { message })
+      if (this.debug) {
+        console.debug('WebSocket message sent', { message })
+      }
     } catch (error) {
       throw AlpacaMarketErrorContext.enrichError(
         error,
@@ -446,7 +457,9 @@ export class AlpacaMarketStreamEndpoint {
   private setState(newState: WSConnectionState): void {
     const oldState = this.state
     this.state = newState
-    console.debug('WebSocket state transition', { from: oldState, to: newState })
+    if (this.debug) {
+      console.debug('WebSocket state transition', { from: oldState, to: newState })
+    }
   }
 
   /**

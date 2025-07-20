@@ -5,6 +5,14 @@ import type { ConditionsParams } from './metadata-endpoint.types.ts'
 import type { TradeCondition, TradeConditionMappings } from '../../types/trade-conditions.ts'
 
 /**
+ * Configuration for metadata endpoint
+ */
+export interface MetadataEndpointConfig {
+  /** Enable debug logging (default: false) */
+  debug?: boolean
+}
+
+/**
  * Raw API response for trade conditions
  */
 interface ConditionsResponse {
@@ -35,7 +43,11 @@ interface ExchangesResponse {
  * @see {@link https://alpaca.markets/docs/api-references/market-data-api}
  */
 export class MetadataEndpoint {
-  constructor(private client: AlpacaMarketClient) {}
+  private readonly debug: boolean
+
+  constructor(private client: AlpacaMarketClient, config?: MetadataEndpointConfig) {
+    this.debug = config?.debug ?? false
+  }
 
   /**
    * Get trade conditions for the specified tick type
@@ -44,7 +56,9 @@ export class MetadataEndpoint {
    * @returns Promise resolving to trade condition mappings
    */
   async getConditions(params: ConditionsParams): Promise<TradeConditionMappings> {
-    console.debug('Getting trade conditions', { params })
+    if (this.debug) {
+      console.debug('Getting trade conditions', { params })
+    }
 
     try {
       const response = await this.client.request<ConditionsResponse>(`/v2/stocks/meta/conditions/${params.ticktype}`, {
@@ -69,7 +83,9 @@ export class MetadataEndpoint {
    * @returns Promise resolving to exchange mappings
    */
   async getExchanges(): Promise<ExchangeMappings> {
-    console.debug('Getting exchanges')
+    if (this.debug) {
+      console.debug('Getting exchanges')
+    }
 
     try {
       const response = await this.client.request<ExchangesResponse>('/v2/stocks/meta/exchanges', {
@@ -111,9 +127,11 @@ export class MetadataEndpoint {
       mappings[code] = condition
     }
 
-    console.debug('Transformed conditions response', {
-      conditionCount: Object.keys(mappings).length,
-    })
+    if (this.debug) {
+      console.debug('Transformed conditions response', {
+        conditionCount: Object.keys(mappings).length,
+      })
+    }
 
     return mappings
   }
@@ -143,9 +161,11 @@ export class MetadataEndpoint {
       mappings[rawExchange.code] = exchange
     }
 
-    console.debug('Transformed exchanges response', {
-      exchangeCount: Object.keys(mappings).length,
-    })
+    if (this.debug) {
+      console.debug('Transformed exchanges response', {
+        exchangeCount: Object.keys(mappings).length,
+      })
+    }
 
     return mappings
   }
