@@ -155,7 +155,10 @@ export class RateLimiter {
 /**
  * Default rate limiters for Alpaca API endpoints
  */
-export const DEFAULT_RATE_LIMITERS = {
+export const DEFAULT_RATE_LIMITERS: {
+  readonly marketData: RateLimiter
+  readonly trading: RateLimiter
+} = {
   // Market data: 200 requests per minute
   marketData: new RateLimiter({
     maxRequests: 200,

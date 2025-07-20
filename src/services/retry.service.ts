@@ -210,7 +210,7 @@ export class RetryManager {
 /**
  * Default retry manager for Alpaca API requests
  */
-export const DEFAULT_RETRY_MANAGER = new RetryManager({
+export const DEFAULT_RETRY_MANAGER: RetryManager = new RetryManager({
   maxAttempts: 3,
   baseDelayMs: 1000,
   maxDelayMs: 10000,
@@ -222,7 +222,7 @@ export const DEFAULT_RETRY_MANAGER = new RetryManager({
 /**
  * Retry manager for market data requests (more aggressive)
  */
-export const MARKET_DATA_RETRY_MANAGER = new RetryManager({
+export const MARKET_DATA_RETRY_MANAGER: RetryManager = new RetryManager({
   maxAttempts: 5,
   baseDelayMs: 500,
   maxDelayMs: 5000,
@@ -234,7 +234,7 @@ export const MARKET_DATA_RETRY_MANAGER = new RetryManager({
 /**
  * Conservative retry manager for trading operations
  */
-export const TRADING_RETRY_MANAGER = new RetryManager({
+export const TRADING_RETRY_MANAGER: RetryManager = new RetryManager({
   maxAttempts: 2,
   baseDelayMs: 2000,
   maxDelayMs: 8000,

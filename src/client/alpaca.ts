@@ -1,4 +1,4 @@
-import type { AlpacaClientConfig, AlpacaEnvironment } from './alpaca.types.ts'
+import type { AlpacaClientConfig, AlpacaEnvironment, ClientHealthMetrics } from './alpaca.types.ts'
 import { createTradingClient } from '../endpoints/trade/trade-endpoint-helpers.ts'
 import { AlpacaTradeEndpoint } from '../endpoints/trade/trade-endpoint.ts'
 import { MarketDataEndpoint } from '../endpoints/market/market-endpoint.ts'
@@ -416,7 +416,7 @@ export class AlpacaMarketClient {
    * including trading, streaming, cache, circuit breaker, request deduplication,
    * connection pool, mapping service, and metadata cache.
    */
-  getHealthMetrics() {
+  getHealthMetrics(): ClientHealthMetrics {
     return {
       client: {
         environment: this.config.environment,

@@ -1,5 +1,11 @@
 import type { ValidationContext, ValidationResult } from '../types/validation.ts'
-import { ERROR_CATEGORY, type ErrorCategory, type OperationalContext } from './errors.types.ts'
+import {
+  type AlpacaMarketErrorJSON,
+  ERROR_CATEGORY,
+  type ErrorCategory,
+  type OperationalContext,
+  type ValidationErrorJSON,
+} from './errors.types.ts'
 
 /**
  * AlpacaMarketValidationError for assertion failures with rich context
@@ -64,7 +70,7 @@ export class AlpacaMarketValidationError extends Error {
   /**
    * Serialize to JSON
    */
-  public toJSON() {
+  public toJSON(): ValidationErrorJSON {
     return {
       name: this.name,
       message: this.message,
@@ -208,7 +214,7 @@ export class AlpacaMarketError extends Error {
   /**
    * Serialize error to JSON with all context
    */
-  public toJSON() {
+  public toJSON(): AlpacaMarketErrorJSON {
     return {
       name: this.name,
       message: this.message,

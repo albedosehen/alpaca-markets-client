@@ -11,7 +11,7 @@ import { validatePosition, validatePositionArray } from '../../validators/positi
 import type { CreateOrderRequest, GetOrdersParams, Order, UpdateOrderRequest } from '../../types/order.ts'
 import type { ClosePositionRequest, Position } from '../../types/position.ts'
 import type { Account, AccountActivity } from '../../types/account.ts'
-import type { GetAccountActivitiesParams, TradingClientConfig } from './trade-endpoint.types.ts'
+import type { GetAccountActivitiesParams, TradeEndpointMetrics, TradingClientConfig } from './trade-endpoint.types.ts'
 
 /**
  * Alpaca Trading API client
@@ -599,7 +599,7 @@ export class AlpacaTradeEndpoint {
   /**
    * Get Alpaca Trading Client metrics
    */
-  getMetrics() {
+  getMetrics(): TradeEndpointMetrics {
     return {
       cache: this.cache?.getMetrics(),
       circuitBreaker: this.circuitBreaker?.getMetrics(),

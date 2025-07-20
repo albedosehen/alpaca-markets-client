@@ -148,6 +148,31 @@ export interface AlpacaAuthCredentials {
  * });
  * // Instantiate a paper trading client config
  */
+/**
+ * Client health metrics interface
+ *
+ * This interface defines the structure of health metrics returned by getHealthMetrics()
+ */
+export interface ClientHealthMetrics {
+  readonly client: {
+    readonly environment: string
+    readonly baseUrl: string
+    readonly dataUrl: string
+  }
+  readonly trading?: unknown
+  readonly streaming?: unknown
+  readonly cache?: unknown
+  readonly circuitBreaker?: unknown
+  readonly requestDeduplication?: unknown
+  readonly connectionPool?: unknown
+  readonly mapping?: {
+    readonly enhancementCacheStats: unknown
+  }
+  readonly metadataCache?: {
+    readonly cacheStats: unknown
+  }
+}
+
 export const createDefaultAlpacaConfig = (
   credentials: AlpacaAuthCredentials,
   overrides?: Partial<AlpacaClientConfig>,

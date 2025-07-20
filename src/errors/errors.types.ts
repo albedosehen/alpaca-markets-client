@@ -63,3 +63,31 @@ export interface OperationalContext {
     lastFailureTime?: Date
   }
 }
+
+/**
+ * JSON serialization interface for AlpacaMarketValidationError
+ */
+export interface ValidationErrorJSON {
+  readonly name: string
+  readonly message: string
+  readonly context?: unknown
+  readonly operationalContext?: OperationalContext
+  readonly stack?: string
+}
+
+/**
+ * JSON serialization interface for AlpacaMarketError
+ */
+export interface AlpacaMarketErrorJSON {
+  readonly name: string
+  readonly message: string
+  readonly status?: number
+  readonly url?: string
+  readonly responseBody?: string
+  readonly rateLimitReset?: string
+  readonly operationalContext?: OperationalContext
+  readonly category: ErrorCategory
+  readonly isRetryable: boolean
+  readonly stack?: string
+  readonly cause?: string
+}

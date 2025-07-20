@@ -28,6 +28,18 @@ export interface TradingClientConfig {
 }
 
 /**
+ * Trade endpoint metrics interface
+ *
+ * This interface defines the structure of metrics returned by getMetrics()
+ */
+export interface TradeEndpointMetrics {
+  readonly cache?: unknown
+  readonly circuitBreaker?: unknown
+  readonly requestDeduplication?: unknown
+  readonly connectionPool?: unknown
+}
+
+/**
  * Request interface for getting account activities.
  *
  * This interface defines the parameters for fetching account activities.
