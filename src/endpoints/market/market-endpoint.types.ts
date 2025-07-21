@@ -7,7 +7,6 @@
 
 import type { Adjustment, Feed, PageToken, Sort, TimeFrame } from '../../types/market.ts'
 
-
 /**
  * Base parameters for market data queries.
  * @property symbols - A single symbol or an array of symbols to query.
