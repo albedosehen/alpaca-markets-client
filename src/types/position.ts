@@ -7,7 +7,7 @@
 import type { Serialized } from '../utils/serializer.ts'
 
 /**
- * Position classes for different asset types.
+ * Position class constants for different asset types.
  *
  * @property US_EQUITY - US equity positions
  * @property CRYPTO - Cryptocurrency positions
@@ -16,6 +16,8 @@ export const POSITION_CLASS = {
   US_EQUITY: 'us_equity',
   CRYPTO: 'crypto',
 } as const
+
+/** Position class type for trading positions */
 export type PositionClass = typeof POSITION_CLASS[keyof typeof POSITION_CLASS]
 
 /**
@@ -28,6 +30,8 @@ export const POSITION_SIDE = {
   Long: 'long',
   Short: 'short',
 } as const
+
+/** Position side type for trading positions */
 export type PositionSide = typeof POSITION_SIDE[keyof typeof POSITION_SIDE]
 
 /**

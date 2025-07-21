@@ -24,10 +24,12 @@ export const TIME_IN_FORCE = {
   OPG: 'opg', // At the Opening
   CLS: 'cls', // At the Close
 } as const
+
+/** Time in force type for trade orders */
 export type TimeInForce = typeof TIME_IN_FORCE[keyof typeof TIME_IN_FORCE]
 
 /**
- * Order class types for grouping related orders.
+ * Order constants for grouping related orders.
  *
  * @property SIMPLE - Simple order
  * @property BRACKET - Bracket order with take profit and stop loss
@@ -40,7 +42,10 @@ export const ORDER_CLASS = {
   OCO: 'oco',
   OTO: 'oto',
 } as const
+
+/** Order class type for placing orders */
 export type OrderClass = typeof ORDER_CLASS[keyof typeof ORDER_CLASS]
+
 /**
  * Sort order options for market data queries.
  *
@@ -51,10 +56,12 @@ export const ORDER_SIDE = {
   Buy: 'buy',
   Sell: 'sell',
 } as const
+
+/** Order side (buy/sell) for an order */
 export type OrderSide = typeof ORDER_SIDE[keyof typeof ORDER_SIDE]
 
 /**
- * Order type values for specifying order behavior.
+ * Order constants for specifying order behavior.
  *
  * @property Market - Market order
  * @property Limit - Limit order
@@ -69,10 +76,12 @@ export const ORDER_TYPE = {
   StopLimit: 'stop_limit',
   TrailingStop: 'trailing_stop',
 } as const
+
+/** Order type for specifying order behavior */
 export type OrderType = typeof ORDER_TYPE[keyof typeof ORDER_TYPE]
 
 /**
- * Order status values for tracking order lifecycle.
+ * Order status constants for tracking order lifecycle.
  *
  * May not encompass all possible values.
  *
@@ -113,6 +122,8 @@ export const ORDER_STATUS = {
   Suspended: 'suspended',
   Calculated: 'calculated',
 } as const
+
+/** Order status type for tracking order lifecycle. */
 export type OrderStatus = typeof ORDER_STATUS[keyof typeof ORDER_STATUS]
 
 /**

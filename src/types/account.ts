@@ -26,6 +26,8 @@ export const ACCOUNT_STATUS = {
   Active: 'ACTIVE',
   Rejected: 'REJECTED',
 } as const
+
+/** Account status type for Alpaca Markets Client */
 export type AccountStatus = typeof ACCOUNT_STATUS[keyof typeof ACCOUNT_STATUS]
 
 /**
@@ -40,6 +42,8 @@ export const CRYPTO_STATUS = {
   Inactive: 'INACTIVE',
   ApprovalPending: 'APPROVAL_PENDING',
 } as const
+
+/** Crypto status type for Alpaca Markets Client */
 export type CryptoStatus = typeof CRYPTO_STATUS[keyof typeof CRYPTO_STATUS]
 
 /**
@@ -112,6 +116,8 @@ export const ACTIVITY_TYPE = {
   Sso: 'SSO',
   Ssp: 'SSP',
 } as const
+
+/** Trading activity type for Alpaca Markets Client */
 export type ActivityType = typeof ACTIVITY_TYPE[keyof typeof ACTIVITY_TYPE]
 
 /**

@@ -16,10 +16,12 @@ export const MARKET_DATA_TYPE = {
   QUOTES: 'quotes',
   TRADES: 'trades',
 } as const
+
+/** Market data type for Market Data Endpoint */
 export type MarketDataType = typeof MARKET_DATA_TYPE[keyof typeof MARKET_DATA_TYPE]
 
 /**
- * Time frame options for market data queries.
+ * Time frame option constants for market data queries.
  *
  * @property ONE_MINUTE - 1 minute time frame
  * @property FIVE_MINUTES - 5 minutes time frame
@@ -40,10 +42,12 @@ export const TIME_FRAME = {
   ONE_WEEK: '1Week',
   ONE_MONTH: '1Month',
 } as const
+
+/** Time frame type for market data queries. */
 export type TimeFrame = typeof TIME_FRAME[keyof typeof TIME_FRAME]
 
 /**
- * Adjustment types for historical market data.
+ * Adjustment constants for historical market data.
  *
  * @property RAW - No adjustments applied
  * @property SPLIT - Adjusted for stock splits
@@ -56,6 +60,8 @@ export const ADJUSTMENT = {
   DIVIDEND: 'dividend',
   ALL: 'all',
 } as const
+
+/** Adjustment type for historical market data. */
 export type Adjustment = typeof ADJUSTMENT[keyof typeof ADJUSTMENT]
 
 /**
@@ -87,6 +93,15 @@ export const SORT = {
   ASC: 'asc',
   DESC: 'desc',
 } as const
+
+/**
+ * Sort type for market data queries.
+ * Represents the order in which market data results should be returned.
+ */
 export type Sort = typeof SORT[keyof typeof SORT]
 
+/**
+ * Page token type for paginated market data queries.
+ * Represents a token used to fetch the next page of results.
+ */
 export type PageToken = string

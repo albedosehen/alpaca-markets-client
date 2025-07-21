@@ -124,6 +124,8 @@ export const ALPACA_ENVIRONMENT = {
   PAPER: 'paper',
   LIVE: 'live',
 } as const
+
+/** Alpaca environment type for Market Data Endpoint */
 export type AlpacaEnvironment = typeof ALPACA_ENVIRONMENT[keyof typeof ALPACA_ENVIRONMENT]
 
 /**

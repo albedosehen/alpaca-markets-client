@@ -5,7 +5,7 @@
  */
 
 /**
- * WebSocket message types for Alpaca API.
+ * WebSocket message constants for Alpaca API.
  *
  * @property Authentication - Authentication message
  * @property Listen - Subscribe to a channel
@@ -36,6 +36,8 @@ export const WS_MESSAGE_TYPE = {
   CancelError: 'c',
   Correction: 'x',
 } as const
+
+/** WebSocket message type for Alpaca API */
 export type WSMessageType = typeof WS_MESSAGE_TYPE[keyof typeof WS_MESSAGE_TYPE]
 
 /**
@@ -56,6 +58,8 @@ export const WS_CONNECTION_STATE = {
   Reconnecting: 'reconnecting',
   Error: 'error',
 } as const
+
+/** WebSocket connection state for Alpaca API */
 export type WSConnectionState = typeof WS_CONNECTION_STATE[keyof typeof WS_CONNECTION_STATE]
 
 /**
@@ -82,6 +86,8 @@ export const WS_SUBSCRIPTION_TYPE = {
   OrderUpdates: 'trade_updates',
   AccountUpdates: 'account_updates',
 } as const
+
+/** WebSocket subscription type for Alpaca API */
 export type WSSubscriptionType = typeof WS_SUBSCRIPTION_TYPE[keyof typeof WS_SUBSCRIPTION_TYPE]
 
 /**
