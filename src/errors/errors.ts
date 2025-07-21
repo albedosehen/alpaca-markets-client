@@ -1,3 +1,9 @@
+/**
+ * AlpacaMarketValidationError and AlpacaMarketError classes for handling errors
+ * with rich context, validation, and operational metadata.
+ * Provides methods for creating, enriching, and converting errors to JSON format.
+ * @module
+ */
 import type { ValidationContext, ValidationResult } from '../types/validation.ts'
 import {
   type AlpacaMarketErrorJSON,
@@ -13,6 +19,19 @@ import {
  * This error extends the base Error class to include validation context and operational context.
  * It provides methods to create errors from validation results, enrich with additional context,
  * and convert to a standard AlpacaMarketError for consistency.
+ *
+ * @param {string} message - Error message
+ * @param {ValidationContext} [context] - Validation context containing rule and field information
+ * @param {OperationalContext} [operationalContext] - Operational context for additional metadata
+ * @throws {AlpacaMarketValidationError} If validation fails
+ * @returns {AlpacaMarketValidationError} The validation error with context
+ * @example Basic usage:
+ * ```typescript
+ * const error = new AlpacaMarketValidationError('Invalid input', {
+ *   field: 'email',
+ *   rule: 'required',
+ * });
+ * ```
  */
 export class AlpacaMarketValidationError extends Error {
   public readonly context?: ValidationContext

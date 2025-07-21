@@ -1,3 +1,9 @@
+/**
+ * Retry manager service for handling API request retries with exponential backoff
+ * Provides a flexible way to retry operations with configurable parameters.
+ * Supports exponential backoff, jitter, and custom retry logic.
+ * @module
+ */
 import { AlpacaMarketError, AlpacaMarketErrorContext } from '../errors/errors.ts'
 
 export interface RetryConfig {

@@ -1,3 +1,8 @@
+/**
+ * Alpaca Market Client
+ * Provides a unified interface for accessing Alpaca's Market Data, Trading, and Streaming APIs.
+ * @module
+ */
 import type { AlpacaClientConfig, AlpacaEnvironment, ClientHealthMetrics } from './alpaca.types.ts'
 import { createTradingClient } from '../endpoints/trade/trade-endpoint-helpers.ts'
 import { AlpacaTradeEndpoint } from '../endpoints/trade/trade-endpoint.ts'

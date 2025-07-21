@@ -1,3 +1,10 @@
+/**
+ * Request deduplication service to prevent duplicate API calls
+ * Ensures that identical requests are only executed once and results are shared
+ * Useful for reducing load on the API and preventing unnecessary duplicate requests
+ * @module
+ */
+
 import { AlpacaMarketErrorContext } from '../errors/errors.ts'
 
 /**

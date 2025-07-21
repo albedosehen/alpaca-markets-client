@@ -1,3 +1,9 @@
+/**
+ * Account Types for Alpaca Markets Client
+ * Provides types and interfaces for user accounts, account activities, and related enums.
+ * @module
+ */
+
 import type { Serialized } from '../utils/serializer.ts'
 
 /**

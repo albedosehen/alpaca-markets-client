@@ -1,3 +1,9 @@
+/**
+ * Position Types for Alpaca Markets Client
+ * Provides types and interfaces for trading positions, including position classes,
+ * position sides, and position data.
+ * @module
+ */
 import type { Serialized } from '../utils/serializer.ts'
 
 /**

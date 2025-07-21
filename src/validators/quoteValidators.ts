@@ -1,3 +1,7 @@
+/**
+ * Internal validators for Alpaca Market quote data.
+ * @module
+ */
 import { AlpacaMarketValidationError } from '../errors/errors.ts'
 import { assertArray, assertNumber, assertObject, assertOptionalString, assertString } from './asserts.ts'
 import type { Quote } from '../types/quote.ts'

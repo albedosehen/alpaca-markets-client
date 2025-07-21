@@ -1,3 +1,9 @@
+/**
+ * Connection pool service for managing HTTP connections
+ * Optimizes API requests by reusing connections to reduce overhead and improve performance
+ * Supports connection pooling with configurable limits, idle timeouts, and keep-alive options.
+ * @module
+ */
 import { AlpacaMarketError } from '../errors/errors.ts'
 
 /**

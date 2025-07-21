@@ -1,3 +1,7 @@
+/**
+ * This module exports the types used throughout the Alpaca Markets Client project.
+ * @module
+ */
 /** Main types module export */
 export {
   type Account,

@@ -1,3 +1,9 @@
+/**
+ * Circuit breaker service for managing API request failures
+ * Provides protection against cascading failures by limiting the number of requests
+ * during periods of high failure rates.
+ * @module
+ */
 import { AlpacaMarketErrorContext } from '../errors/errors.ts'
 
 /**

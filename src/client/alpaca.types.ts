@@ -1,3 +1,9 @@
+/**
+ * Types, interfaces, and constants for Alpaca Client Configuration
+ * Provides types for Alpaca client configuration, including authentication credentials,
+ * environment settings, and WebSocket configurations.
+ * @module
+ */
 import type { CircuitBreakerConfig } from '../services/circuit-breaker.service.ts'
 import type { WebSocketConfig, WebSocketEventHandlers } from '../types/websocket.ts'
 import type { RequestDeduplicationConfig } from '../services/request-deduplication.service.ts'

@@ -1,3 +1,9 @@
+/**
+ * Rate limiter service for controlling API request rates
+ * Implements a simple token bucket algorithm to limit the number of requests
+ * within a specified time window. It allows for a buffer to prevent immediate rate limit hits.
+ * @module
+ */
 import { AlpacaMarketErrorContext } from '../errors/errors.ts'
 
 export interface RateLimitConfig {

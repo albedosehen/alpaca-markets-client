@@ -1,5 +1,8 @@
 /**
- * Cache entry with TTL and metadata
+ * Cache service for in-memory caching with TTL, LRU eviction, and metrics
+ * Provides a flexible caching solution with support for time-to-live, eviction policies,
+ * and metrics collection.
+ * @module
  */
 interface CacheEntry<T> {
   readonly value: T

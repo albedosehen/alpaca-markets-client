@@ -1,3 +1,10 @@
+/**
+ * Market Data Endpoints for Alpaca Markets Client
+ * Provides methods for fetching historical and latest market data,
+ * including bars, quotes, and trades for specified symbols.
+ * Supports pagination, sorting, and various data feeds.
+ * @module
+ */
 import type { AlpacaMarketClient } from '../../client/alpaca.ts'
 import type { MappingService } from '../../services/mapping.service.ts'
 import type { QuoteEnhanced } from '../../types/quote.ts'

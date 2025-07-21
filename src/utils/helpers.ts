@@ -1,3 +1,9 @@
+/**
+ * Internal utility functions for Alpaca Markets Client
+ * Provides helper functions for JSON serialization, error handling, environment checks,
+ * JWT validation, and type checking.
+ * @module
+ */
 import { assertNonSensitiveString } from '../validators/asserts.ts'
 import { PATTERNS } from './patterns.ts'
 import type { AnyFn } from '../types/shared.ts'

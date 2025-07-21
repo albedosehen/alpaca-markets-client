@@ -1,4 +1,11 @@
 /**
+ * Quote Types for Alpaca Markets Client
+ * Provides types and interfaces for quote data, including raw quote data,
+ * normalized quote data, enhanced quote data with metadata mappings.
+ * @module
+ */
+
+/**
  * Raw quote data from Alpaca API (exact API response format)
  *
  * @property t - Timestamp in ISO 8601 format

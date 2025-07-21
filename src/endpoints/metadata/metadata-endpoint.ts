@@ -1,3 +1,9 @@
+/**
+ * Metadata Endpoint for Alpaca Markets Client
+ * Provides methods for fetching trade conditions, exchange information,
+ * and tape codes from the Alpaca API, transforming raw API responses into structured mappings.
+ * @module
+ */
 import type { AlpacaMarketClient } from '../../client/alpaca.ts'
 import { AlpacaMarketErrorContext } from '../../errors/errors.ts'
 import type { Exchange, ExchangeMappings, ExchangeRaw } from '../../types/exchanges.ts'

@@ -1,3 +1,7 @@
+/**
+ * Order types and interfaces for Alpaca Markets trading API.
+ * @module
+ */
 import type { Sort } from './market.ts'
 
 /**

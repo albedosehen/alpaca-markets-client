@@ -1,3 +1,9 @@
+/**
+ * Helpers for Market Endpoint
+ * Provides factory functions to create market data clients with default configurations
+ * for bars, quotes, and trades, allowing customization of query parameters.
+ * @module
+ */
 import type { MappingService } from '../../services/mapping.service.ts'
 import type { QuoteEnhanced } from '../../types/quote.ts'
 import type { Bar, BarRaw } from '../../types/bar.ts'

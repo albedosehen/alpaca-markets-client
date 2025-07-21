@@ -1,5 +1,9 @@
 /**
- * Alpaca Markets API Endpoints
+ * Endpoints Module for Alpaca Markets Client
+ * Provides access to various endpoints including Market Data, Metadata, Trading, and Streaming.
+ * Each endpoint is designed to interact with Alpaca's API, providing methods for data retrieval,
+ * trading operations, and real-time updates.
+ * @module
  */
 
 /** Market Data Endpoint */

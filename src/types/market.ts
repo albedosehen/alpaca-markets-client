@@ -1,4 +1,10 @@
 /**
+ * Market Types for Alpaca Markets Client
+ * Provides types and interfaces for market data.
+ * @module
+ */
+
+/**
  * Market data type options.
  *
  * @property BARS - Represents bar data (OHLCV)

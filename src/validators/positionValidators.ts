@@ -1,3 +1,7 @@
+/**
+ * Internal validators for Alpaca Market position data.
+ * @module
+ */
 import { AlpacaMarketValidationError } from '../errors/errors.ts'
 import { assertArray, assertObject, assertString } from './asserts.ts'
 import type { Position } from '../types/position.ts'

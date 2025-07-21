@@ -1,5 +1,11 @@
 /**
- * Helper type for serializing nested objects without requiring id field
+ * Internal Serializer Module
+ * @module
+ */
+
+/**
+ * SerializedObject type
+ * Represents an object where each property is serialized to a JSON-safe format.
  */
 type SerializedObject<T> = {
   [K in keyof T]: SerializedValue<T[K]>

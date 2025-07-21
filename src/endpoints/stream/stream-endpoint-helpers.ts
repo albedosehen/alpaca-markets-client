@@ -1,3 +1,9 @@
+/**
+ * Helpers for WebSocket Streaming Endpoint
+ * Provides factory functions to create WebSocket clients with default configurations
+ * for trading updates and market data, allowing customization of WebSocket settings.
+ * @module
+ */
 import type { WebSocketConfig, WebSocketEventHandlers } from '../../types/websocket.ts'
 import type { AlpacaClientConfig } from '../../client/alpaca.types.ts'
 import { AlpacaMarketStreamEndpoint } from './stream-endpoint.ts'

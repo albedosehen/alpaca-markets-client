@@ -1,3 +1,8 @@
+/**
+ * Mapping service for enhancing trade and quote data
+ * with metadata such as exchange names, tape descriptions, and condition mappings.
+ * @module
+ */
 import { AlpacaMarketErrorContext } from '../errors/errors.ts'
 import type { MetadataCache } from './metadata-cache.service.ts'
 import {

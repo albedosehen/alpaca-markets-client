@@ -1,4 +1,11 @@
 /**
+ * Validation Types for Alpaca Markets Client
+ * Provides types and interfaces for structured error metadata, validation results,
+ * and validation contexts.
+ * @module
+ */
+
+/**
  * Validation context for structured error metadata
  */
 export interface ValidationContext {

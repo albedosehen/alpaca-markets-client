@@ -1,3 +1,8 @@
+/**
+ * Exchange Types for Alpaca Markets Client
+ * Provides types and interfaces for exchange data.
+ * @module
+ */
 import type { Serialized } from '../utils/serializer.ts'
 
 /**

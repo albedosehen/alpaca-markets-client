@@ -1,3 +1,9 @@
+/**
+ * Bar Types for Alpaca Markets Client
+ * Provides types and interfaces for bar data.
+ * @module
+ */
+
 import type { Serialized } from '../utils/serializer.ts'
 
 /**

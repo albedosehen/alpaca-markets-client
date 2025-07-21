@@ -1,3 +1,7 @@
+/**
+ * Internal validators for Alpaca Market account data.
+ * @module
+ */
 import { assertArray, assertBoolean, assertNumber, assertObject, assertString } from './asserts.ts'
 import { EnumValues } from '../utils/helpers.ts'
 import { AlpacaMarketValidationError } from '../errors/errors.ts'

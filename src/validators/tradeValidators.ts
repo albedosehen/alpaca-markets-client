@@ -1,3 +1,7 @@
+/**
+ * Internal validators for Alpaca Market trade data.
+ * @module
+ */
 import { assertArray, assertBoolean, assertNumber, assertObject, assertString } from './asserts.ts'
 import { AlpacaMarketValidationError } from '../errors/errors.ts'
 import type { Trade, TradeEnhanced, TradeMappingStatus, TradeWithMappingStatus } from '../types/trade.ts'

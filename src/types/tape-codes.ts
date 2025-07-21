@@ -1,3 +1,9 @@
+/**
+ * Tape Codes Types for Alpaca Markets Client
+ * Provides types and interfaces for tape code data.
+ * @module
+ */
+
 import type { Serialized } from '../utils/serializer.ts'
 
 /**

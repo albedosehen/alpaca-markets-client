@@ -1,8 +1,7 @@
 /**
- * Enhanced assertion utilities with AlpacaMarketValidationError integration
- * Provides comprehensive validation functions that throw AlpacaMarketValidationError with rich context
+ * Internal assertion module for validation and sanitization.
+ * @module
  */
-
 import { type ValidationContext } from '../types/validation.ts'
 import { AlpacaMarketValidationError } from '../errors/errors.ts'
 import { PATTERNS } from '../utils/patterns.ts'

@@ -1,3 +1,9 @@
+/**
+ * Trade Types for Alpaca Markets Client
+ * Provides types and interfaces for trade data.
+ * @module
+ */
+
 import type { Serialized } from '../utils/serializer.ts'
 
 /**

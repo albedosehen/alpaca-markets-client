@@ -1,3 +1,8 @@
+/**
+ * Types and interfaces for Trade Endpoint
+ * Provides types for trading operations, account activities, and trading client configuration.
+ * @module
+ */
 import type { Sort } from '../../types/market.ts'
 import type { CircuitBreakerConfig } from '../../services/circuit-breaker.service.ts'
 

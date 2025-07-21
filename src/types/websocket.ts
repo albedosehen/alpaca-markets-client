@@ -1,4 +1,10 @@
 /**
+ * WebSocket Types for Alpaca API
+ * Provides types and constants for WebSocket connections, messages, and subscriptions.
+ * @module
+ */
+
+/**
  * WebSocket message types for Alpaca API.
  *
  * @property Authentication - Authentication message

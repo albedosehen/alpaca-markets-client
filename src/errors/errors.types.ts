@@ -1,4 +1,11 @@
 /**
+ * Error types and interfaces for Alpaca Markets Client
+ * Provides structured error handling with validation, operational context,
+ * and categorization for better debugging and error management.
+ * @module
+ */
+
+/**
  * Error categories for better classification and handling
  *
  * @property NETWORK - Network-related errors

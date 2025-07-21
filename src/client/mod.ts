@@ -1,5 +1,9 @@
 /**
- * The main Alpaca Market Client
+ * Alpaca Markets Client Module
+ * Provides a unified interface for accessing Alpaca's Market Data, Trading, and Streaming APIs.
+ * This module includes factory functions for creating clients with default configurations,
+ * as well as utility functions for handling authentication, environment detection, and credential management.
+ * @module
  */
 export { AlpacaMarketClient } from './alpaca.ts'
 export {

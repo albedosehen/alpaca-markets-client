@@ -1,3 +1,9 @@
+/**
+ * Helpers for Trade Endpoint
+ * Provides factory functions to create trading clients with different configurations
+ * for various trading strategies, including conservative and high-frequency trading.
+ * @module
+ */
 import type { AlpacaMarketClient } from '../../client/alpaca.ts'
 import { AlpacaTradeEndpoint } from './trade-endpoint.ts'
 import type { TradingClientConfig } from './trade-endpoint.types.ts'

@@ -1,3 +1,9 @@
+/**
+ * Types and interfaces for Market Endpoint
+ * Defines types and interfaces for market data queries,
+ * including parameters for bars, quotes, trades, and latest data retrieval.
+ * @module
+ */
 import type { Adjustment, Feed, PageToken, Sort, TimeFrame } from '../../types/market.ts'
 
 export interface BaseParams {

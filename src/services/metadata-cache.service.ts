@@ -1,3 +1,9 @@
+/**
+ * Metadata cache service for Alpaca Markets Client
+ * Provides caching for tape codes, trade conditions, and exchange mappings
+ * with support for lazy loading, TTL, and fallback defaults.
+ * @module
+ */
 import { AlpacaMarketErrorContext } from '../errors/errors.ts'
 import { DEFAULT_TRADE_CONDITIONS, type TradeConditionMappings } from '../types/trade-conditions.ts'
 import { DEFAULT_EXCHANGES, type ExchangeMappings } from '../types/exchanges.ts'

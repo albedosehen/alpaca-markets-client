@@ -1,4 +1,11 @@
 /**
+ * Response Types for Alpaca Markets Client
+ * Provides types and interfaces for API responses, including paginated responses,
+ * error responses, and generic API responses.
+ * @module
+ */
+
+/**
  * API response structure from Alpaca Market
  *
  * This defines the standard format for all API responses,

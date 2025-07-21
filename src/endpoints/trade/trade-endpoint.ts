@@ -1,3 +1,9 @@
+/**
+ * Trade Endpoint for Alpaca Markets Client
+ * Provides methods for managing orders, positions, and account information
+ * with support for caching, circuit breaking, and request deduplication.
+ * @module
+ */
 import { AlpacaMarketError, AlpacaMarketErrorContext } from '../../errors/errors.ts'
 import { AlpacaMarketClient } from '../../client/alpaca.ts'
 import { Cache } from '../../services/cache.service.ts'

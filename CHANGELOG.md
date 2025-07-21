@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.1] - 2025-07-20
+
+### Added
+
+- Additional typings and JSDoc comments for discoverability and improved documentation.
+
+---
+
 ## [0.1.0] - 2025-07-20
 
 ### Initial Release

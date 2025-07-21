@@ -1,5 +1,13 @@
 /**
- * RegEX pattern collection for input validation / sanitization.
+ * Internal Patterns Module
+ * @module
+ */
+
+/**
+ * Patterns for various validation and sanitization tasks.
+ * This module exports a collection of RegEx patterns used for validating and sanitizing inputs,
+ * including numeric strings, wildcards, field names, table names, passwords, and sensitive data
+ * patterns.
  */
 export const PATTERNS = {
   NUMERIC_STRING: /^\d+$/,

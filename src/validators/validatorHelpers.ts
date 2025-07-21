@@ -1,6 +1,6 @@
 /**
- * Enhanced validation utilities using the new ValidationResult pattern
- * This module provides functions to validate various inputs with comprehensive error reporting
+ * Internal Validators for Alpaca Markets Client
+ * @module
  */
 
 import {

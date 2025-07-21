@@ -1,3 +1,10 @@
+/**
+ * WebSocket Streaming Endpoint for Alpaca Markets Client
+ * Provides methods for connecting to Alpaca's WebSocket API,
+ * subscribing to market data and trading updates, and handling real-time messages.
+ * Supports automatic reconnection, message queuing, and metrics tracking.
+ * @module
+ */
 import { AlpacaMarketErrorContext } from '../../errors/errors.ts'
 import { WS_CONNECTION_STATE, WS_MESSAGE_TYPE } from '../../types/websocket.ts'
 import type {
